@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2E6B3C">
+<title>Kookhulp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
+<style>
+:root{
+  --bg:#F3F6F1;--surface:#FFFFFF;--ink:#1D2B21;--muted:#5E6B61;--line:#D6DED6;
+  --basil:#2E6B3C;--basil-soft:#DCEBDD;--saffron:#F0B429;--tomato:#B83A26;
+  --head:'Bricolage Grotesque',system-ui,sans-serif;
+  --body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#121814;--surface:#1B231D;--ink:#E8EFE8;--muted:#9AA89C;--line:#2C3A30;
+    --basil:#6FBF7E;--basil-soft:#22382A;--saffron:#E3A92A;--tomato:#E27460;}
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45}
+body{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,select:focus-visible{outline:3px solid var(--saffron);outline-offset:2px}
+.wrap{max-width:560px;margin:0 auto;padding:0 18px}
+header.top{padding:calc(22px + env(safe-area-inset-top,0px)) 0 8px}
+header h1{font-family:var(--head);font-weight:700;font-size:2.1rem;line-height:1.05;margin:0;letter-spacing:-.02em}
+header p{margin:6px 0 0;color:var(--muted)}
+section.block{margin:22px 0}
+h2{font-family:var(--head);font-weight:700;font-size:1.25rem;margin:0 0 4px}
+.hint{color:var(--muted);font-size:.93rem;margin:0 0 12px}
+
+/* niveau */
+.levels{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.levels button{border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 0;font-family:var(--head);font-weight:700;font-size:1.3rem}
+.levels button[aria-pressed=true]{background:var(--basil);border-color:var(--basil);color:#fff}
+.levels button.below{border-color:var(--basil)}
+.leveltext{margin:10px 0 0;padding:12px 14px;background:var(--basil-soft);border-radius:12px}
+
+/* toggles */
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:8px}
+.toggle .sw{flex:none;width:46px;height:28px;border-radius:14px;background:var(--line);position:relative;transition:background .15s}
+.toggle .sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .15s}
+.toggle[aria-pressed=true] .sw{background:var(--basil)}
+.toggle[aria-pressed=true] .sw::after{transform:translateX(18px)}
+.toggle small{display:block;color:var(--muted)}
+
+/* borden (eters) */
+.plates{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:end}
+.plate{text-align:center}
+.disc{margin:0 auto 8px;border-radius:50%;background:var(--surface);border:2px solid var(--line);display:grid;place-items:center;box-shadow:inset 0 0 0 7px var(--bg)}
+.disc span{font-family:var(--head);font-weight:700;font-size:1.6rem}
+.disc.on{border-color:var(--basil);box-shadow:inset 0 0 0 7px var(--basil-soft)}
+.plate .lbl{font-weight:700}
+.plate .fx{color:var(--muted);font-size:.85rem}
+.step{display:inline-flex;gap:6px;margin-top:8px}
+.step button{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:1.3rem;line-height:1}
+.total{margin-top:14px;font-weight:700}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 14px}
+.chip[aria-pressed=true]{background:var(--basil);border-color:var(--basil);color:#fff}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+
+/* winkel */
+select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;width:100%}
+.order{list-style:none;margin:0;padding:0;counter-reset:a}
+.order li{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 8px 8px 12px;margin-bottom:6px;counter-increment:a}
+.order li::before{content:counter(a);font-family:var(--head);font-weight:700;color:var(--basil);width:1.4em}
+.order li span{flex:1}
+.order button{width:38px;height:38px;border-radius:8px;border:1px solid var(--line);background:var(--bg)}
+.order button:disabled{opacity:.3;cursor:default}
+
+/* recepten */
+.rec{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px}
+.rec.sel{border:2px solid var(--basil);padding:13px}
+.rec.off{opacity:.62}
+.rec h3{font-family:var(--head);font-weight:700;font-size:1.1rem;margin:0}
+.meta{color:var(--muted);font-size:.9rem;margin:2px 0 8px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.tag{font-size:.8rem;border-radius:6px;padding:2px 8px;background:var(--basil-soft)}
+.tag.swap{background:color-mix(in srgb,var(--saffron) 28%,transparent)}
+.why{color:var(--tomato);font-size:.9rem;margin:0}
+.btn{border:0;border-radius:12px;padding:12px 16px;background:var(--basil);color:#fff;font-weight:700;width:100%}
+.btn.ghost{background:transparent;color:var(--basil);border:2px solid var(--basil)}
+.btn.small{width:auto;padding:9px 14px}
+.bar{display:flex;gap:8px;margin:14px 0}
+.bar .btn{flex:1}
+
+/* lijst */
+.sec h2{font-size:1.05rem;margin:18px 0 6px;color:var(--basil)}
+.item{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:6px}
+.box{flex:none;width:26px;height:26px;border-radius:8px;border:2px solid var(--line);margin-top:1px;display:grid;place-items:center;font-weight:700;color:#fff}
+.item[aria-pressed=true] .box{background:var(--basil);border-color:var(--basil)}
+.item[aria-pressed=true] .nm{text-decoration:line-through;color:var(--muted)}
+.nm{font-weight:700}
+.buy{display:block}
+.sub{display:block;color:var(--muted);font-size:.85rem}
+.left{color:var(--basil);font-weight:700}
+.warn{color:var(--tomato)}
+.empty{text-align:center;padding:40px 10px;color:var(--muted)}
+.empty .btn{max-width:260px;margin-top:14px}
+
+/* tabs */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+nav.tabs button{border:0;background:none;padding:9px 0 10px;font-size:.78rem;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px}
+nav.tabs button .ic{font-size:1.35rem;line-height:1}
+nav.tabs button[aria-current=page]{color:var(--basil);font-weight:700}
+.badge{background:var(--saffron);color:#1D2B21;border-radius:999px;font-size:.7rem;padding:0 6px;margin-left:2px}
+/* kookmodus */
+#cook{position:fixed;inset:0;background:var(--bg);z-index:20;display:none;flex-direction:column;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+#cook.open{display:flex}
+.ck-head{display:flex;align-items:center;gap:10px;padding:12px 18px 8px;max-width:560px;width:100%;margin:0 auto}
+.ck-head h2{flex:1;margin:0;font-size:1.05rem}
+.ck-x{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:1.1rem}
+.prog{height:6px;background:var(--line);border-radius:3px;margin:0 18px;max-width:524px;width:calc(100% - 36px);align-self:center;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--basil);transition:width .2s}
+.ck-body{flex:1;overflow-y:auto;padding:14px 18px 20px;max-width:560px;width:100%;margin:0 auto}
+.ck-n{color:var(--muted);margin:0 0 6px}
+.ck-t{font-size:1.45rem;line-height:1.4;margin:0 0 16px}
+.ck-t b{color:var(--basil)}
+.tm{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 16px}
+.tm div{background:var(--basil-soft);border-radius:12px;padding:10px 8px;text-align:center}
+.tm small{display:block;color:var(--muted);font-size:.8rem}
+.tm strong{font-family:var(--head);font-size:1.25rem}
+.tm .rev{grid-column:1/-1;font-weight:700}
+.tm-label{font-weight:700;margin:0 0 6px}
+.uitleg{background:var(--surface);border-left:4px solid var(--saffron);border-radius:8px;padding:12px 14px;margin:0 0 16px}
+details.uitleg summary{cursor:pointer;font-weight:700}
+.tstart{border:2px solid var(--basil);background:var(--surface);color:var(--basil);border-radius:14px;padding:14px;width:100%;font-weight:700;font-size:1.1rem}
+.timers{display:flex;flex-wrap:wrap;gap:6px;padding:0 18px 6px;max-width:560px;width:100%;margin:0 auto}
+.timers:empty{display:none}
+.tchip{border:0;border-radius:999px;padding:7px 12px;background:var(--ink);color:var(--bg);font-weight:700;font-variant-numeric:tabular-nums}
+.tchip.done{background:var(--saffron);color:#1D2B21;animation:pulse 1s infinite}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.ck-nav{display:grid;grid-template-columns:1fr 2fr;gap:10px;padding:10px 18px 14px;max-width:560px;width:100%;margin:0 auto}
+.ck-nav .btn{padding:16px;font-size:1.05rem}
+.mise .item{padding:10px 12px}
+.warnbox{background:color-mix(in srgb,var(--tomato) 14%,transparent);border-radius:10px;padding:10px 12px;margin:0 0 12px}
+.serve{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin:10px 0 18px}
+.serve .disc{margin:0 0 4px}
+.rate{display:grid;gap:8px;margin-top:10px}
+.banner{background:var(--basil);color:#fff;border-radius:14px;padding:14px;margin:16px 0 0}
+.banner .btn{background:#fff;color:var(--basil);margin-top:10px}
+.cookbtn{margin-left:8px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><h1 id="title">Kookhulp</h1><p id="sub"></p></header>
+  <main id="view"></main>
+</div>
+<nav class="tabs" id="tabs"></nav>
+<div id="cook" role="dialog" aria-modal="true" aria-label="Kookmodus"></div>
+
+<script>
+/* ---------- basisgegevens ---------- */
+const LEVELS = {
+  1:'Starter: snijden, pasta koken, roerbakken en ovenschotels. Elke handeling wordt uitgelegd.',
+  2:'Basis: een saus maken, rijst of pasta naast een tweede pan, vlees goed gaar krijgen.',
+  3:'Gevorderd: meerdere pannen tegelijk timen en zelf op smaak brengen.',
+  4:'Ervaren: stoven, deeg, technieken combineren.',
+  5:'Thuischef: het recept is een richtlijn, jij beslist.'
+};
+const SIZES = [
+  {k:'klein', l:'Klein', f:0.75, d:74},
+  {k:'medium', l:'Medium', f:1, d:92},
+  {k:'groot', l:'Groot', f:1.4, d:110}
+];
+const APPARATEN = [['thermomix','Thermomix TM5'],['oven','Oven'],['airfryer','Airfryer'],['magnetron','Magnetron']];
+const GEREI = [['koekenpan','Koekenpan'],['wok','Wok'],['grote pan','Grote kookpan'],['steelpan','Steelpan'],['ovenschaal','Ovenschaal'],['snijplank','Snijplank'],['koksmes','Koksmes'],['weegschaal','Weegschaal'],['staafmixer','Staafmixer'],['rasp','Rasp']];
+const AFD = ['Groente & fruit','Brood','Vlees & vis','Kaas & vleeswaren','Zuivel & eieren','Pasta, rijst & wereld','Conserven & sauzen','Kruiden & bakken','Diepvries'];
+const WINKELS = ['Albert Heijn','Jumbo','Lidl','Aldi','Plus','Dirk'];
+const VOORRAAD = {
+  olijfolie:{n:'Olijfolie',s:'Kruiden & bakken'}, zout:{n:'Zout',s:'Kruiden & bakken'},
+  peper:{n:'Zwarte peper',s:'Kruiden & bakken'}, knoflook:{n:'Knoflook',s:'Groente & fruit'},
+  boter:{n:'Roomboter',s:'Zuivel & eieren'}, paprikapoeder:{n:'Paprikapoeder',s:'Kruiden & bakken'},
+  komijn:{n:'Komijn',s:'Kruiden & bakken'}, kerrie:{n:'Kerriepoeder',s:'Kruiden & bakken'},
+  italiaans:{n:'Italiaanse kruiden',s:'Kruiden & bakken'}, chili:{n:'Chilivlokken',s:'Kruiden & bakken'}
+};
+const A='Groente & fruit',V='Vlees & vis',K='Kaas & vleeswaren',Z='Zuivel & eieren',P='Pasta, rijst & wereld',C='Conserven & sauzen',KB='Kruiden & bakken',B='Brood';
+const BLOEMKOOLRIJST={n:'Bloemkoolrijst',s:A,q:150,u:'g',pk:400};
+/* q = hoeveelheid per medium portie, pk = verpakkingsgrootte (schatting, pas aan naar jouw AH) */
+const RECEPTEN = [
+ {id:'pesto',t:'Pasta pesto met kip',l:1,min:20,pt:2,e:['koekenpan','grote pan'],p:['olijfolie','zout','peper'],i:[
+  {n:'Penne',q:100,u:'g',s:P,pk:500,gf:false,gfAlt:{n:'Glutenvrije penne',pk:500},lc:false,lcAlt:{n:'Courgetti',s:A,q:150,pk:300}},
+  {n:'Kipfilet',q:100,u:'g',s:V,pk:300},
+  {n:'Groene pesto',q:35,u:'g',s:C,pk:185},
+  {n:'Cherrytomaten',q:100,u:'g',s:A,pk:250},
+  {n:'Rucola',q:20,u:'g',s:A,pk:75}]},
+ {id:'krieltjes',t:'Kip met krieltjes uit de oven',l:1,min:40,pt:0,e:['oven','ovenschaal'],p:['olijfolie','zout','peper','paprikapoeder','italiaans'],i:[
+  {n:'Krieltjes',q:200,u:'g',s:A,pk:600,lc:false,lcAlt:{n:'Bloemkoolroosjes',q:200,pk:400}},
+  {n:'Kipdijfilet',q:125,u:'g',s:V,pk:400},
+  {n:'Rode paprika',q:0.5,u:'st',s:A,pk:1},
+  {n:'Rode ui',q:0.5,u:'st',s:A,pk:1},
+  {n:'Courgette',q:0.5,u:'st',s:A,pk:1}]},
+ {id:'omelet',t:'Omelet met spinazie en feta',l:1,min:15,pt:1,e:['koekenpan'],p:['boter','zout','peper'],i:[
+  {n:'Eieren',q:2,u:'st',s:Z,pk:6},
+  {n:'Spinazie',q:75,u:'g',s:A,pk:200},
+  {n:'Feta',q:40,u:'g',s:K,pk:200},
+  {n:'Cherrytomaten',q:75,u:'g',s:A,pk:250}]},
+ {id:'zalm',t:'Zalm met broccoli uit de oven',l:1,min:25,pt:0,e:['oven','ovenschaal'],p:['olijfolie','zout','peper','knoflook'],i:[
+  {n:'Zalmfilet',q:1,u:'st',s:V,pk:2},
+  {n:'Broccoli',q:0.5,u:'st',s:A,pk:1},
+  {n:'Citroen',q:0.25,u:'st',s:A,pk:1}]},
+ {id:'wok',t:'Roerbaknoedels met kip',l:1,min:20,pt:2,e:['wok|koekenpan','grote pan'],p:['olijfolie','knoflook'],i:[
+  {n:'Mienestjes',q:75,u:'g',s:P,pk:250,gf:false,gfAlt:{n:'Rijstnoedels',pk:225},lc:false},
+  {n:'Kipfilet',q:100,u:'g',s:V,pk:300},
+  {n:'Wokgroente',q:200,u:'g',s:A,pk:400},
+  {n:'Sojasaus',q:15,u:'ml',s:P,pk:150,gf:false,gfAlt:{n:'Tamari (glutenvrije sojasaus)',pk:150}}]},
+ {id:'soep',t:'Tomatensoep uit de Thermomix',l:1,min:30,pt:0,e:['thermomix'],p:['olijfolie','zout','peper','knoflook'],i:[
+  {n:'Trostomaten',q:300,u:'g',s:A,pk:500},
+  {n:'Ui',q:0.5,u:'st',s:A,pk:1},
+  {n:'Winterpeen',q:0.5,u:'st',s:A,pk:1},
+  {n:'Kookroom',q:30,u:'ml',s:Z,pk:250},
+  {n:'Groentebouillontablet',q:0.5,u:'st',s:KB,pk:8,gfNote:true}]},
+ {id:'wraps',t:'Wraps met gehakt en maïs',l:1,min:20,pt:1,e:['koekenpan'],p:['olijfolie','zout','peper','paprikapoeder','komijn'],i:[
+  {n:'Tortillawraps',q:2,u:'st',s:B,pk:6,gf:false,gfAlt:{n:'Glutenvrije wraps',pk:4},lc:false,lcAlt:{n:'IJsbergsla (bladeren als wrap)',s:A,q:0.25,u:'st',pk:1}},
+  {n:'Rundergehakt',q:100,u:'g',s:V,pk:300},
+  {n:'Maïs',q:50,u:'g',s:C,pk:300},
+  {n:'Geraspte kaas',q:30,u:'g',s:K,pk:150},
+  {n:'Crème fraîche',q:30,u:'ml',s:Z,pk:125}]},
+ {id:'chili',t:'Chili con carne met rijst',l:2,min:40,pt:2,e:['grote pan','steelpan'],p:['olijfolie','zout','peper','komijn','paprikapoeder','chili','knoflook'],i:[
+  {n:'Rundergehakt',q:100,u:'g',s:V,pk:300},
+  {n:'Kidneybonen',q:100,u:'g',s:C,pk:400},
+  {n:'Tomatenblokjes',q:200,u:'g',s:C,pk:400},
+  {n:'Ui',q:0.5,u:'st',s:A,pk:1},
+  {n:'Rode paprika',q:0.5,u:'st',s:A,pk:1},
+  {n:'Rijst',q:75,u:'g',s:P,pk:400,lc:false,lcAlt:BLOEMKOOLRIJST}]},
+ {id:'kerrie',t:'Kip kerrie met rijst',l:2,min:30,pt:2,e:['koekenpan','steelpan'],p:['olijfolie','zout','kerrie','knoflook'],i:[
+  {n:'Kipfilet',q:100,u:'g',s:V,pk:300},
+  {n:'Kokosmelk',q:100,u:'ml',s:P,pk:400},
+  {n:'Rode paprika',q:0.5,u:'st',s:A,pk:1},
+  {n:'Ui',q:0.5,u:'st',s:A,pk:1},
+  {n:'Sperziebonen',q:100,u:'g',s:A,pk:400},
+  {n:'Rijst',q:75,u:'g',s:P,pk:400,lc:false,lcAlt:BLOEMKOOLRIJST}]},
+ {id:'risotto',t:'Champignonrisotto uit de Thermomix',l:2,min:35,pt:0,e:['thermomix'],p:['olijfolie','boter','zout','peper'],i:[
+  {n:'Risottorijst',q:80,u:'g',s:P,pk:500,lc:false},
+  {n:'Kastanjechampignons',q:125,u:'g',s:A,pk:250},
+  {n:'Parmezaanse kaas',q:25,u:'g',s:K,pk:150},
+  {n:'Ui',q:0.5,u:'st',s:A,pk:1},
+  {n:'Groentebouillontablet',q:0.5,u:'st',s:KB,pk:8,gfNote:true}]}
+];
+
+/* ---------- opslag ---------- */
+const KEY='kookhulp-v1';
+const DEFAULT={niveau:1,gv:false,lc:false,eters:{klein:0,medium:2,groot:0},
+  kit:{thermomix:true,oven:true,koekenpan:true,'grote pan':true,steelpan:true,snijplank:true,koksmes:true},
+  pitten:4,voorraad:{olijfolie:true,zout:true,peper:true},winkel:'Albert Heijn',order:AFD.slice(),menu:[],checked:{},tab:'ik',cook:null,log:[]};
+let S;
+try{S=Object.assign({},DEFAULT,JSON.parse(localStorage.getItem(KEY)||'{}'));}catch(e){S=Object.assign({},DEFAULT);}
+AFD.forEach(a=>{if(!S.order.includes(a))S.order.push(a)});
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+/* ---------- logica ---------- */
+const factor=()=>SIZES.reduce((t,z)=>t+S.eters[z.k]*z.f,0);
+const eters=()=>SIZES.reduce((t,z)=>t+S.eters[z.k],0);
+const kitName=k=>(APPARATEN.concat(GEREI).find(x=>x[0]===k)||[k,k])[1].toLowerCase();
+
+function check(r){
+  const why=[],swaps=[];let gvSw=false,lcSw=false;
+  if(r.l>S.niveau)why.push('vanaf niveau '+r.l);
+  const mist=r.e.filter(x=>!x.split('|').some(k=>S.kit[k]));
+  if(mist.length)why.push('mist '+mist.map(x=>x.split('|').map(kitName).join(' of ')).join(', '));
+  if(r.pt>S.pitten)why.push('heeft '+r.pt+' kookpitten nodig');
+  const ing=r.i.map(x=>{
+    let y=Object.assign({},x);
+    if(S.gv&&y.gf===false){
+      if(y.gfAlt){swaps.push(y.gfAlt.n);gvSw=true;y=Object.assign({},y,y.gfAlt,{gf:true});}
+      else why.push('niet glutenvrij te maken');
+    }
+    if(S.lc&&y.lc===false){
+      if(y.lcAlt){swaps.push(y.lcAlt.n);lcSw=true;y=Object.assign({},y,y.lcAlt,{lc:true});}
+      else why.push('niet koolhydraatarm te maken');
+    }
+    return y;
+  });
+  return {ok:!why.length,why:[...new Set(why)],swaps,ing,gvSw,lcSw};
+}
+
+function buildList(){
+  const f=factor(),m={};
+  S.menu.forEach(id=>{
+    const r=RECEPTEN.find(x=>x.id===id); if(!r)return;
+    const c=check(r); if(!c.ok)return;
+    c.ing.forEach(x=>{
+      const k=x.n+'|'+x.u;
+      m[k]=m[k]||{k,n:x.n,u:x.u,s:x.s,pk:x.pk,q:0,from:[],note:S.gv&&x.gfNote};
+      m[k].q+=x.q*f; m[k].from.push(r.t);
+    });
+    r.p.forEach(p=>{
+      if(S.voorraad[p])return;
+      const k='V|'+p;
+      m[k]=m[k]||{k,n:VOORRAAD[p].n,s:VOORRAAD[p].s,pantry:true,from:[]};
+      m[k].from.push(r.t);
+    });
+  });
+  return Object.values(m);
+}
+
+function fmtSt(q){
+  const r=Math.round(q*4)/4,w=Math.floor(r),fr={0:'',0.25:'¼',0.5:'½',0.75:'¾'}[r-w];
+  return (w||!fr?w:'')+fr;
+}
+function fmt(q,u){return u==='st'?fmtSt(q)+' st':Math.round(q/5)*5+' '+u}
+function buyText(x){
+  if(x.pantry)return {buy:'1 verpakking',sub:'staat niet in je voorraadkast'};
+  const packs=Math.max(1,Math.ceil(x.q/x.pk-1e-9)),over=packs*x.pk-x.q;
+  if(x.u==='st'&&x.pk===1)return {buy:packs+(packs===1?' stuk':' stuks'),sub:fmt(x.q,'st')+' nodig',over:over>=0.25?fmtSt(over)+' over':''};
+  const pack=x.u==='st'?'verpakking van '+x.pk:x.pk+' '+x.u;
+  return {buy:packs+' × '+pack,sub:fmt(x.q,x.u)+' nodig',over:over>=(x.u==='st'?0.25:10)?fmt(over,x.u)+' over':''};
+}
+
+/* ---------- weergave ---------- */
+const TABS=[['ik','🍽️','Ik'],['keuken','🔪','Keuken'],['winkel','🛒','Winkel'],['menu','📖','Menu'],['lijst','✅','Lijst']];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pressed=b=>' aria-pressed="'+(!!b)+'"';
+
+function vIk(){
+  const lv=[1,2,3,4,5].map(n=>`<button data-act="niveau" data-v="${n}"${pressed(S.niveau===n)} class="${n<S.niveau?'below':''}" aria-label="Niveau ${n}">${n}</button>`).join('');
+  const plates=SIZES.map(z=>{const n=S.eters[z.k];return `<div class="plate">
+    <div class="disc${n?' on':''}" style="width:${z.d}px;height:${z.d}px"><span>${n}</span></div>
+    <div class="lbl">${z.l}</div><div class="fx">${String(z.f).replace('.',',')} portie</div>
+    <div class="step"><button data-act="eter" data-k="${z.k}" data-d="-1" aria-label="${z.l} eter minder">−</button><button data-act="eter" data-k="${z.k}" data-d="1" aria-label="${z.l} eter erbij">+</button></div></div>`}).join('');
+  return `<section class="block"><h2>Kookniveau</h2><p class="hint">Je ziet alleen recepten tot en met dit niveau.</p>
+    <div class="levels">${lv}</div><p class="leveltext">${LEVELS[S.niveau]}</p>${levelBanner()}</section>
+  <section class="block"><h2>Eters</h2><p class="hint">Hoeveelheden worden per bordmaat omgerekend.</p>
+    <div class="plates">${plates}</div>
+    <p class="total">${eters()} ${eters()===1?'eter':'eters'}, samen ${String(Math.round(factor()*100)/100).replace('.',',')} porties</p></section>
+  <section class="block"><h2>Voeding</h2><p class="hint">Niet verplicht. Aan betekent: recepten worden aangepast of vallen af.</p>
+    <button class="toggle" data-act="gv"${pressed(S.gv)}><span>Glutenvrij<small>Pasta, wraps en sojasaus worden vervangen</small></span><span class="sw"></span></button>
+    <button class="toggle" data-act="lc"${pressed(S.lc)}><span>Koolhydraatarm<small>Rijst, pasta en aardappel worden groente</small></span><span class="sw"></span></button></section>`;
+}
+function vKeuken(){
+  const chips=(list,obj)=>list.map(([k,l])=>`<button class="chip" data-act="kit" data-k="${k}"${pressed(obj[k])}>${l}</button>`).join('');
+  const vr=Object.entries(VOORRAAD).map(([k,v])=>`<button class="chip" data-act="vr" data-k="${k}"${pressed(S.voorraad[k])}>${v.n}</button>`).join('');
+  return `<section class="block"><h2>Apparaten</h2><p class="hint">Recepten waarvoor je iets mist worden niet voorgesteld.</p><div class="chips">${chips(APPARATEN,S.kit)}</div></section>
+  <section class="block"><h2>Kookplaat</h2><div class="row"><span>Aantal kookpitten</span>
+    <span class="step" style="margin:0;align-items:center"><button data-act="pit" data-d="-1" aria-label="Minder pitten">−</button><b style="min-width:1.5em;text-align:center">${S.pitten}</b><button data-act="pit" data-d="1" aria-label="Meer pitten">+</button></span></div></section>
+  <section class="block"><h2>Pannen en gerei</h2><div class="chips">${chips(GEREI,S.kit)}</div></section>
+  <section class="block"><h2>Altijd in huis</h2><p class="hint">Wat je aanzet komt niet op de boodschappenlijst.</p><div class="chips">${vr}</div></section>`;
+}
+function vWinkel(){
+  const opts=WINKELS.map(w=>`<option${w===S.winkel?' selected':''}>${w}</option>`).join('');
+  const li=S.order.map((a,i)=>`<li><span>${esc(a)}</span>
+    <button data-act="mv" data-i="${i}" data-d="-1"${i===0?' disabled':''} aria-label="${esc(a)} omhoog">↑</button>
+    <button data-act="mv" data-i="${i}" data-d="1"${i===S.order.length-1?' disabled':''} aria-label="${esc(a)} omlaag">↓</button></li>`).join('');
+  return `<section class="block"><h2>Supermarkt</h2><select id="winkel" aria-label="Supermarkt">${opts}</select></section>
+  <section class="block"><h2>Looproute</h2><p class="hint">Zet de afdelingen in de volgorde waarin je door jouw winkel loopt. De lijst volgt deze volgorde.</p><ol class="order">${li}</ol></section>`;
+}
+function vMenu(){
+  const rs=RECEPTEN.map(r=>({r,c:check(r)})).sort((a,b)=>(b.c.ok-a.c.ok)||(a.r.l-b.r.l));
+  const n=S.menu.length;
+  return `<div class="bar"><button class="btn" data-act="tab" data-v="lijst"${n?'':' disabled style="opacity:.5"'}>Maak boodschappenlijst (${n})</button></div>`+
+  rs.map(({r,c})=>{const sel=S.menu.includes(r.id);
+    const n2=S.log.filter(x=>x.id===r.id&&x.r==='goed').length;
+    const tags=[`<span class="tag">niveau ${r.l}</span>`].concat(n2?[`<span class="tag">${n2}× gelukt</span>`]:[]).concat(r.e.includes('thermomix')?['<span class="tag">Thermomix</span>']:[]).concat(c.swaps.map(s=>`<span class="tag swap">${esc(s)}</span>`)).join('');
+    return `<article class="rec${sel?' sel':''}${c.ok?'':' off'}"><h3>${esc(r.t)}</h3>
+      <p class="meta">${r.min} minuten</p><div class="tags">${tags}</div>
+      ${c.ok?`<button class="btn small${sel?'':' ghost'}" data-act="pick" data-id="${r.id}"${pressed(sel)}>${sel?'In het menu':'Zet in menu'}</button><button class="btn small cookbtn" data-act="cook" data-id="${r.id}">Kook nu</button>`
+            :`<p class="why">Nu niet: ${esc(c.why.join(', '))}</p>`}</article>`}).join('');
+}
+function vLijst(){
+  const items=buildList();
+  if(!items.length)return `<div class="empty"><p>Nog geen gerechten gekozen. Kies in het menu wat je wilt koken, dan verschijnt hier je lijst.</p><button class="btn" data-act="tab" data-v="menu">Naar het menu</button></div>`;
+  const done=items.filter(x=>S.checked[x.k]).length;
+  let h=`<p class="hint">${done} van ${items.length} in je mandje. Verpakkingen zijn schattingen.</p>`;
+  S.order.forEach(a=>{
+    const g=items.filter(x=>x.s===a).sort((x,y)=>x.n.localeCompare(y.n));
+    if(!g.length)return;
+    h+=`<div class="sec"><h2>${esc(a)}</h2>`+g.map(x=>{const b=buyText(x);
+      return `<button class="item" data-act="chk" data-k="${esc(x.k)}"${pressed(S.checked[x.k])}><span class="box">${S.checked[x.k]?'✓':''}</span>
+        <span><span class="nm">${esc(x.n)}</span><span class="buy">${b.buy}</span>
+        <span class="sub">${b.sub}${b.over?', <span class="left">'+b.over+'</span>':''}</span>
+        ${x.note?'<span class="sub warn">Controleer het etiket op gluten</span>':''}
+        <span class="sub">Voor: ${esc([...new Set(x.from)].join(', '))}</span></span></button>`}).join('')+`</div>`;
+  });
+  h+=`<div class="bar"><button class="btn ghost" data-act="share">Deel lijst</button><button class="btn ghost" data-act="reset">Nieuwe week</button></div>`;
+  return h;
+}
+const SUB={ik:'Jouw niveau, eters en voeding.',keuken:'Wat er in je keuken staat.',winkel:'Waar je boodschappen doet.',
+  menu:()=>'Gerechten voor '+eters()+(eters()===1?' eter':' eters')+' op niveau '+S.niveau+'.',lijst:()=>'Boodschappen bij '+S.winkel+'.'};
+
+function render(){
+  const t=S.tab,title=TABS.find(x=>x[0]===t)[2];
+  document.getElementById('title').textContent={ik:'Kookhulp',keuken:'Keuken',winkel:'Winkel',menu:'Menu',lijst:'Boodschappen'}[t]||title;
+  const s=SUB[t];document.getElementById('sub').textContent=typeof s==='function'?s():s;
+  document.getElementById('view').innerHTML={ik:vIk,keuken:vKeuken,winkel:vWinkel,menu:vMenu,lijst:vLijst}[t]();
+  document.getElementById('tabs').innerHTML=TABS.map(([k,ic,l])=>`<button data-act="tab" data-v="${k}"${t===k?' aria-current="page"':''}><span class="ic">${ic}</span><span>${l}${k==='menu'&&S.menu.length?'<span class="badge">'+S.menu.length+'</span>':''}</span></button>`).join('');
+  renderCook();
+  const w=document.getElementById('winkel');
+  if(w)w.onchange=e=>{S.winkel=e.target.value;save();};
+}
+
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const d=b.dataset,a=d.act;
+  if(a==='tab'){S.tab=d.v;window.scrollTo(0,0);}
+  else if(a==='niveau'){S.niveau=+d.v;}
+  else if(a==='eter'){S.eters[d.k]=Math.max(0,Math.min(12,S.eters[d.k]+ +d.d));}
+  else if(a==='gv'){S.gv=!S.gv;}
+  else if(a==='lc'){S.lc=!S.lc;}
+  else if(a==='kit'){S.kit[d.k]=!S.kit[d.k];}
+  else if(a==='vr'){S.voorraad[d.k]=!S.voorraad[d.k];}
+  else if(a==='pit'){S.pitten=Math.max(1,Math.min(8,S.pitten+ +d.d));}
+  else if(a==='mv'){const i=+d.i,j=i+ +d.d;[S.order[i],S.order[j]]=[S.order[j],S.order[i]];}
+  else if(a==='pick'){S.menu=S.menu.includes(d.id)?S.menu.filter(x=>x!==d.id):S.menu.concat(d.id);}
+  else if(a==='chk'){S.checked[d.k]=!S.checked[d.k];}
+  else if(a==='reset'){if(!confirm('Menu en afvinkjes wissen?'))return;S.menu=[];S.checked={};S.tab='menu';}
+  else if(a==='cook'){openCook(d.id);return;}
+  else if(a==='ck-next'){S.cook.step++;}
+  else if(a==='ck-prev'){S.cook.step=Math.max(0,S.cook.step-1);}
+  else if(a==='ck-close'){if(timers.some(t=>!t.done)&&!confirm('Er lopen nog timers. Toch stoppen?'))return;closeCook();}
+  else if(a==='ck-timer'){startTimer(d.l,+d.s);return;}
+  else if(a==='ck-tstop'){timers=timers.filter(t=>t.id!==+d.id);renderTimers();return;}
+  else if(a==='mise'){mise[d.k]=!mise[d.k];renderCook();return;}
+  else if(a==='rate'){S.log.push({id:S.cook.id,r:d.v,d:Date.now(),n:S.niveau});closeCook();S.tab='menu';}
+  else if(a==='lvup'){S.niveau=Math.min(5,S.niveau+1);}
+  else if(a==='share'){shareList();return;}
+  save();render();
+});
+
+function shareList(){
+  const items=buildList();let txt='Boodschappen '+S.winkel+'\n';
+  S.order.forEach(a=>{const g=items.filter(x=>x.s===a&&!S.checked[x.k]);if(!g.length)return;
+    txt+='\n'+a+'\n'+g.map(x=>'- '+x.n+': '+buyText(x).buy).join('\n')+'\n';});
+  if(navigator.share)navigator.share({title:'Boodschappen',text:txt}).catch(()=>{});
+  else if(navigator.clipboard)navigator.clipboard.writeText(txt).then(()=>alert('Lijst gekopieerd.'),()=>alert(txt));
+  else alert(txt);
+}
+/* ---------- kookstappen (deel 2) ----------
+   {0} = hoeveelheid + naam van ingrediënt 0 (omgerekend voor jullie eters)
+   {=150 ml} = hoeveelheid die meeschaalt (bijv. water)
+   if: 'lc' / '!lc' / 'gv' / '!gv' = alleen tonen als die vervanging wel/niet actief is
+   lc / gv = andere tekst of timer bij vervanging.  tm = Thermomix TM5-instelling */
+const OVEN={t:'Zet de oven aan op 200 °C, of 180 °C als je hetelucht gebruikt.',u:'Voorverwarmen duurt ongeveer 10 minuten. Ga ondertussen door met de volgende stap.'};
+const STAPPEN={
+ pesto:{stap:[
+  {if:'!lc',t:'Vul de grote pan voor twee derde met water, doe er een flinke snuf zout in en zet hem met deksel op hoog vuur.',u:'Ongeveer 1 liter water per 100 gram pasta. Het zout geeft de pasta smaak.'},
+  {t:'Snijd {1} in blokjes van ongeveer 2 cm. Halveer {3}.',u:'Klauwgreep: vingertoppen naar binnen gekruld, je knokkels langs het mes. Was de plank na de kip met heet water en zeep.'},
+  {if:'!lc',t:'Kookt het water? Doe {0} erin en roer één keer goed om. Kook zonder deksel volgens de verpakking.',u:'Koken betekent dat het water flink borrelt. Zonder deksel, anders kookt het over.',timer:600,tl:'Pasta'},
+  {t:'Verhit een scheut olijfolie in de koekenpan op middelhoog vuur. Bak de kip rondom bruin en gaar.',u:'Laat de stukjes eerst een minuut stil liggen, dan krijgen ze een bruin korstje. Gaar is van binnen helemaal wit. Snijd er één doormidden om te controleren.',timer:420,tl:'Kip'},
+  {if:'lc',t:'Doe {0} bij de kip en schep 2 minuten om tot hij warm is.',timer:120,tl:'Courgetti'},
+  {if:'!lc',t:'Giet de pasta af in een vergiet. Vang eerst een klein kopje kookwater op.',u:'Met een scheutje kookwater wordt de pesto smeuïg in plaats van droog.'},
+  {t:'Schep de pasta, de kip, {2} en de tomaatjes door elkaar. Te droog? Een scheutje kookwater erbij. Peper erover.',lc:{t:'Schep {2} en de tomaatjes door de kip en courgetti. Peper erover.'}},
+  {t:'Leg {4} er vlak voor het opdienen bovenop.'}]},
+ krieltjes:{stap:[
+  OVEN,
+  {t:'Halveer {0}.',lc:{t:'Snijd grote roosjes van {0} doormidden.'},u:'Even grote stukken worden tegelijk gaar.'},
+  {t:'Snijd {1} in stukken van 3 cm. Snijd {2}, {3} en {4} in grove stukken.',u:'Paprika: snijd de kop eraf, haal zaadjes en witte zijwanden weg. Ui: kapje eraf, halveren, schil eraf trekken, dan in parten.'},
+  {t:'Doe alles in de ovenschaal. Besprenkel met 2 eetlepels olijfolie en strooi paprikapoeder, Italiaanse kruiden, zout en peper erover. Schep goed om.',u:'Omscheppen gaat het best met je handen. Zo zit er overal olie en kruiden aan.'},
+  {t:'Zet de schaal in het midden van de oven. Schep halverwege één keer om.',timer:2100,tl:'Oven',lc:{timer:1500}},
+  {t:'Controleer: de kip is van binnen wit en een vork gaat makkelijk in de krieltjes. Nog niet? Nog 5 minuten.',lc:{t:'Controleer: de kip is van binnen wit en de bloemkool is zacht met bruine randjes. Nog niet? Nog 5 minuten.'}}]},
+ omelet:{stap:[
+  {t:'Halveer {3} en verkruimel {2}.'},
+  {t:'Klop {0} los in een kom met een snuf zout en peper.',u:'Kloppen met een vork tot geel en wit één kleur zijn. Meer dan 3 eieren? Bak dan meerdere omeletten na elkaar, 2 à 3 eieren per keer.'},
+  {t:'Smelt een klontje boter in de koekenpan op middelhoog vuur. Bak {1} tot hij slap is en haal hem uit de pan.',timer:90,tl:'Spinazie'},
+  {t:'Nog een klontje boter erin. Giet de eieren in de pan en laat ze op laag vuur stollen.',u:'Stollen betekent dat het ei vast wordt. Til de rand af en toe op met een spatel, zodat vloeibaar ei eronder loopt.',timer:180,tl:'Ei'},
+  {t:'Verdeel spinazie, feta en tomaatjes over de helft. Deksel of bord erop, tot de bovenkant net vast is.',timer:120,tl:'Omelet'},
+  {t:'Vouw de omelet dubbel en laat hem op het bord glijden.'}]},
+ zalm:{stap:[
+  OVEN,
+  {t:'Snijd {1} in roosjes en de steel in plakjes. Snijd 1 teen knoflook fijn.',u:'Roosjes: snijd de kleine takjes los van de dikke steel. De steel is ook lekker, schil alleen de harde buitenkant eraf.'},
+  {t:'Leg de broccoli in de ovenschaal met 1 eetlepel olijfolie, de knoflook, zout en peper. Schep om en zet de schaal in de oven.',timer:600,tl:'Broccoli'},
+  {t:'Leg {0} tussen de broccoli, huid naar beneden. Zout, peper en een scheutje sap van {2} erover.'},
+  {t:'Schuif de schaal terug in de oven.',u:'Zalm is gaar als hij met een vork makkelijk uit elkaar valt en in het midden niet meer glazig is.',timer:780,tl:'Zalm'},
+  {t:'Serveer met een partje citroen.'}]},
+ wok:{stap:[
+  {t:'Snijd {1} in reepjes en 1 teen knoflook fijn.',u:'Reepjes van een halve centimeter dik worden in een paar minuten gaar.'},
+  {t:'Kook {0} in de grote pan volgens de verpakking. Giet af en spoel kort met koud water.',u:'Koud afspoelen voorkomt dat de noedels aan elkaar plakken.',timer:240,tl:'Noedels',gv:{t:'Laat {0} volgens de verpakking wellen in heet water. Giet af en spoel kort met koud water.',timer:300}},
+  {t:'Verhit 1 eetlepel olie in de wok op hoog vuur. Roerbak de kip tot hij gaar is.',u:'Roerbakken betekent hoog vuur en steeds omscheppen, zodat niets aanbrandt.',timer:300,tl:'Kip'},
+  {t:'Doe de knoflook en {2} erbij en roerbak nog even mee.',timer:180,tl:'Groente'},
+  {t:'Voeg de noedels en {3} toe. Schep om tot alles warm is.',timer:90,tl:'Afmaken'}]},
+ soep:{tmMax:4,stap:[
+  {t:'Halveer {1} en pel 1 teen knoflook. Schil {2} en snijd in stukken. Snijd {0} in vieren.'},
+  {t:'Doe de ui en knoflook in de mengkom en hak.',tm:{tijd:'5 sec',sn:'5'},u:'Duw daarna met de spatel de stukjes van de wand naar beneden.'},
+  {t:'Voeg 1 eetlepel olijfolie toe en fruit.',tm:{tijd:'3 min',temp:'120 °C',sn:'1'},u:'Fruiten is zacht bakken tot de ui glazig is, niet bruin.',timer:180,tl:'Fruiten'},
+  {t:'Doe de tomaten, de peen, {4} en {=150 ml} water erbij en kook.',tm:{tijd:'20 min',temp:'100 °C',sn:'1'},timer:1200,tl:'Soep'},
+  {t:'Pureer met de maatbeker op het deksel. Voer de snelheid langzaam op.',tm:{tijd:'1 min',sn:'5 → 10'},u:'Hete soep altijd rustig opbouwen van 5 naar 10, anders spat het langs het deksel.'},
+  {t:'Voeg {3} toe en meng. Proef en breng op smaak met zout en peper.',tm:{tijd:'10 sec',sn:'3'}}]},
+ risotto:{tmMax:4,stap:[
+  {t:'Doe {2} in stukjes in de droge mengkom en rasp. Schep de kaas in een kommetje.',tm:{tijd:'10 sec',sn:'10'},u:'De mengkom moet echt droog zijn, anders klontert de kaas.'},
+  {t:'Snijd {1} in plakjes.'},
+  {t:'Doe {3}, gehalveerd, in de mengkom en hak.',tm:{tijd:'5 sec',sn:'5'}},
+  {t:'Voeg 1 eetlepel olijfolie toe en fruit.',tm:{tijd:'3 min',temp:'120 °C',sn:'1'},timer:180,tl:'Fruiten'},
+  {t:'Voeg {0} en de champignons toe en bak mee.',tm:{tijd:'3 min',temp:'120 °C',sn:'1',links:true},u:'Linksom (het pijltje naar links) laat het mes met de botte kant draaien. Zo blijft de rijst heel.',timer:180,tl:'Rijst'},
+  {t:'Voeg {4} en {=250 ml} water toe. Zet het garmandje op het deksel in plaats van de maatbeker.',tm:{tijd:'17 min',temp:'100 °C',sn:'lepel',links:true},u:'Het garmandje houdt spetters tegen maar laat stoom ontsnappen.',timer:1020,tl:'Risotto'},
+  {t:'Schep de risotto in een schaal. Roer een klontje boter en de parmezaan erdoor, peper erover. Laat kort rusten.',timer:120,tl:'Rusten'}]},
+ wraps:{stap:[
+  {t:'Laat {2} uitlekken in een zeef.'},
+  {t:'Verhit 1 eetlepel olie in de koekenpan op middelhoog vuur. Bak {1} rul.',u:'Rul bakken: breek het gehakt met de spatel steeds in kleine stukjes, tot er geen roze meer te zien is.',timer:420,tl:'Gehakt'},
+  {t:'Voeg 1 theelepel paprikapoeder, ½ theelepel komijn, zout, peper en de maïs toe en bak mee.',timer:120,tl:'Kruiden'},
+  {t:'Verwarm {0} kort in een droge pan, ongeveer 20 seconden per kant.',lc:{t:'Was de bladeren van {0} en dep ze droog met keukenpapier.'}},
+  {t:'Beleg met het gehakt, {3} en een lepel {4}. Oprollen en eten.',lc:{t:'Schep het gehakt in de slabladeren, met {3} en een lepel {4} erop.'}}]},
+ chili:{stap:[
+  {t:'Snipper {3}, snijd 2 tenen knoflook fijn en snijd {4} in blokjes.',u:'Snipperen is heel fijn snijden. Halveer de ui, maak eerst sneden in de lengte, dan dwars.'},
+  {t:'Verhit 1 eetlepel olie in de grote pan op middelhoog vuur. Bak ui en knoflook zacht.',timer:180,tl:'Ui'},
+  {t:'Voeg {0} toe en bak rul.',u:'Breek het gehakt steeds in kleine stukjes tot er geen roze meer te zien is.',timer:360,tl:'Gehakt'},
+  {t:'Doe de paprika, 1 theelepel komijn, 1 theelepel paprikapoeder en een snuf chilivlokken erbij en bak kort mee.',u:'Kruiden even meebakken maakt de smaak sterker.',timer:60,tl:'Kruiden'},
+  {t:'Voeg {2} en de uitgelekte {1} toe. Deksel half erop, laag vuur, af en toe roeren.',u:'Pruttelen betekent kleine belletjes. Borrelt het hard, zet het vuur lager.',timer:1200,tl:'Chili'},
+  {if:'!lc',t:'Kook ondertussen {5} in de steelpan volgens de verpakking.',u:'Twee pannen tegelijk is de vaardigheid van niveau 2. Rijst duurt meestal 12 minuten, dus hij is tegelijk met de chili klaar.',timer:720,tl:'Rijst'},
+  {if:'lc',t:'Bak {5} in de laatste 5 minuten in de steelpan met een beetje olie.',timer:300,tl:'Bloemkoolrijst'},
+  {t:'Proef en breng de chili op smaak met zout en peper.'}]},
+ kerrie:{stap:[
+  {t:'Snijd {0} in blokjes, {3} in halve ringen en {2} in reepjes. Haal de puntjes van {4} en halveer ze.'},
+  {if:'!lc',t:'Kook {5} in de steelpan volgens de verpakking.',u:'Start de rijst nu, dan is hij klaar als de kerrie klaar is.',timer:720,tl:'Rijst'},
+  {t:'Verhit 1 eetlepel olie in de koekenpan. Bak de kip rondom bruin.',timer:300,tl:'Kip'},
+  {t:'Voeg de ui, 1 fijngesneden teen knoflook en 1½ theelepel kerriepoeder toe en bak mee.',timer:120,tl:'Kerrie'},
+  {t:'Voeg de paprika, de sperziebonen en {1} toe. Laat zacht koken tot de bonen beetgaar zijn.',u:'Beetgaar: gaar, maar nog een klein beetje stevig als je erin bijt.',timer:600,tl:'Saus'},
+  {if:'lc',t:'Bak {5} kort in een pan met een beetje olie.',timer:300,tl:'Bloemkoolrijst'},
+  {t:'Proef en breng op smaak met zout.'}]}
+};
+
+let timers=[],tid=0,mise={},audio=null,wake=null;
+const amt=(q,u)=>u==='st'?fmtSt(q):fmt(q,u);
+function fill(t,ing,f){
+  return esc(t).replace(/\{(\d+)\}/g,(m,i)=>{const x=ing[+i];return x?'<b>'+amt(x.q*f,x.u)+' '+x.n.toLowerCase()+'</b>':m})
+    .replace(/\{=(\d+) (\w+)\}/g,(m,q,u)=>'<b>'+Math.max(10,Math.round(q*f/10)*10)+' '+u+'</b>');
+}
+function cookSteps(r,c){
+  const def=STAPPEN[r.id]||{stap:[]},cond={lc:c.lcSw,'!lc':!c.lcSw,gv:c.gvSw,'!gv':!c.gvSw};
+  const st=def.stap.filter(x=>!x.if||cond[x.if]).map(x=>{
+    let y=Object.assign({},x);
+    if(c.gvSw&&x.gv)Object.assign(y,x.gv);
+    if(c.lcSw&&x.lc)Object.assign(y,x.lc);
+    return y;});
+  return [{mise:true}].concat(st,[{serve:true}]);
+}
+function openCook(id){S.cook={id,step:0};mise={};timers=[];save();render();lockScreen();window.scrollTo(0,0);}
+function closeCook(){S.cook=null;timers=[];releaseWake();save();render();}
+
+function vMise(r,c,f){
+  const ing=c.ing.map((x,j)=>({k:'i'+j,t:amt(x.q*f,x.u)+' '+x.n.toLowerCase()}));
+  const pan=r.p.map(p=>({k:'p'+p,t:VOORRAAD[p].n}));
+  const eq=r.e.concat(['snijplank','koksmes'].filter(k=>S.kit[k]&&!r.e.includes(k)));
+  const ger=eq.map(e=>({k:'e'+e,t:e.split('|').filter(k=>S.kit[k]).map(kitName).join(' of ')||kitName(e)}));
+  const list=(title,arr)=>`<div class="sec mise"><h2>${title}</h2>${arr.map(x=>`<button class="item" data-act="mise" data-k="${x.k}"${pressed(mise[x.k])}><span class="box">${mise[x.k]?'✓':''}</span><span class="nm">${esc(x.t)}</span></button>`).join('')}</div>`;
+  const def=STAPPEN[r.id]||{};
+  const warn=def.tmMax&&f>def.tmMax?`<p class="warnbox">Voor ${String(Math.round(f*10)/10).replace('.',',')} porties is de mengkom van de TM5 (2,2 liter) waarschijnlijk te vol. Maak het in twee keer.</p>`:'';
+  const noSteps=!(def.stap&&def.stap.length)?'<p class="warnbox">Voor dit recept zijn nog geen kookstappen ingevoerd.</p>':'';
+  return `<p class="ck-n">Eerst klaarzetten</p><p class="ck-t" style="font-size:1.2rem">Zet alles op het aanrecht voordat je begint. Dan hoef je tijdens het koken niets te zoeken.</p>${warn}${noSteps}${list('Ingrediënten',ing)}${list('Uit de voorraadkast',pan)}${list('Pannen en gerei',ger)}`;
+}
+function vStep(st,c,f,i,n){
+  let h=`<p class="ck-n">Stap ${i} van ${n-2}</p><p class="ck-t">${fill(st.t,c.ing,f)}</p>`;
+  if(st.tm)h+=`<p class="tm-label">Thermomix</p><div class="tm"><div><small>Tijd</small><strong>${st.tm.tijd}</strong></div><div><small>Temperatuur</small><strong>${st.tm.temp||'uit'}</strong></div><div><small>Snelheid</small><strong>${st.tm.sn}</strong></div>${st.tm.links?'<div class="rev">↺ Linksom aan</div>':''}</div>`;
+  if(st.u)h+=S.niveau<=2?`<div class="uitleg"><strong>Zo doe je dat</strong><br>${esc(st.u)}</div>`:`<details class="uitleg"><summary>Uitleg</summary>${esc(st.u)}</details>`;
+  if(st.timer)h+=`<button class="tstart" data-act="ck-timer" data-s="${st.timer}" data-l="${esc(st.tl||'Stap '+i)}">Start timer ${mmss(st.timer)}</button>`;
+  return h;
+}
+function vServe(r){
+  const f=factor();
+  const plates=SIZES.filter(z=>S.eters[z.k]).map(z=>Array.from({length:S.eters[z.k]},()=>`<div class="plate"><div class="disc on" style="width:${Math.round(z.d*.75)}px;height:${Math.round(z.d*.75)}px"><span style="font-size:1rem">${Math.round(z.f/f*100)}%</span></div><div class="fx">${z.l}</div></div>`).join('')).join('');
+  return `<p class="ck-n">Opdienen</p><p class="ck-t" style="font-size:1.2rem">Verdeel wat in de pan zit over de borden. Het getal is ongeveer welk deel van de pan op dat bord gaat.</p>
+  <div class="serve">${plates}</div>
+  <h2>Hoe ging het?</h2><p class="hint">Na 3 verschillende gelukte gerechten stelt de app het volgende niveau voor.</p>
+  <div class="rate"><button class="btn" data-act="rate" data-v="goed">Lekker en gelukt</button><button class="btn ghost" data-act="rate" data-v="lastig">Gelukt, maar lastig</button><button class="btn ghost" data-act="rate" data-v="niet">Niet mijn smaak</button>
+  <button class="btn ghost" data-act="ck-prev" style="border:0">Terug naar de laatste stap</button></div>`;
+}
+function renderCook(){
+  const el=document.getElementById('cook');
+  if(!S.cook){el.className='';el.innerHTML='';document.body.style.overflow='';return;}
+  const r=RECEPTEN.find(x=>x.id===S.cook.id);
+  if(!r){S.cook=null;return renderCook();}
+  const c=check(r),f=factor(),steps=cookSteps(r,c);
+  S.cook.step=Math.min(S.cook.step,steps.length-1);
+  const i=S.cook.step,st=steps[i],last=i===steps.length-1;
+  const body=!f?'<p class="warnbox">Er staan geen eters ingesteld. Zet bij Ik minstens één eter aan.</p>':st.mise?vMise(r,c,f):st.serve?vServe(r):vStep(st,c,f,i,steps.length);
+  el.className='open';document.body.style.overflow='hidden';
+  el.innerHTML=`<div class="ck-head"><h2>${esc(r.t)}</h2><button class="ck-x" data-act="ck-close" aria-label="Kookmodus sluiten">✕</button></div>
+  <div class="prog"><i style="width:${Math.round(i/(steps.length-1)*100)}%"></i></div>
+  <div class="timers" id="timers"></div><div class="ck-body">${body}</div>
+  ${last?'':`<div class="ck-nav"><button class="btn ghost" data-act="ck-prev"${i?'':' disabled style="opacity:.4"'}>Vorige</button><button class="btn" data-act="ck-next"${f?'':' disabled style="opacity:.5"'}>${st.mise?'Alles staat klaar':i===steps.length-2?'Klaar, opdienen':'Volgende stap'}</button></div>`}`;
+  renderTimers();
+}
+
+/* timers */
+function mmss(s){s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+function startTimer(l,sec){ensureAudio();timers.push({id:++tid,l,end:Date.now()+sec*1000,done:false});renderTimers();}
+function renderTimers(){
+  const el=document.getElementById('timers');if(!el)return;
+  el.innerHTML=timers.map(t=>`<button class="tchip${t.done?' done':''}" data-act="ck-tstop" data-id="${t.id}" aria-label="Timer ${esc(t.l)} stoppen">${esc(t.l)} <span data-tid="${t.id}">${t.done?'klaar!':mmss((t.end-Date.now())/1000)}</span> ✕</button>`).join('');
+}
+setInterval(()=>{
+  let ch=false;
+  timers.forEach(t=>{if(t.done)return;const left=(t.end-Date.now())/1000;
+    if(left<=0){t.done=true;ch=true;alarm();}
+    else{const e=document.querySelector('[data-tid="'+t.id+'"]');if(e)e.textContent=mmss(left);}});
+  if(ch)renderTimers();
+},500);
+function ensureAudio(){try{audio=audio||new(window.AudioContext||window.webkitAudioContext)();audio.resume();}catch(e){}}
+function alarm(){
+  try{navigator.vibrate&&navigator.vibrate([400,200,400,200,400]);}catch(e){}
+  if(!audio)return;
+  try{const t0=audio.currentTime;for(let k=0;k<3;k++){const o=audio.createOscillator(),g=audio.createGain();
+    o.frequency.value=880;o.connect(g);g.connect(audio.destination);
+    g.gain.setValueAtTime(0.25,t0+k*0.5);g.gain.exponentialRampToValueAtTime(0.001,t0+k*0.5+0.35);
+    o.start(t0+k*0.5);o.stop(t0+k*0.5+0.4);}}catch(e){}
+}
+/* scherm aan houden tijdens koken */
+async function lockScreen(){try{if('wakeLock' in navigator)wake=await navigator.wakeLock.request('screen');}catch(e){}}
+function releaseWake(){try{wake&&wake.release();}catch(e){}wake=null;}
+document.addEventListener('visibilitychange',()=>{if(S.cook&&document.visibilityState==='visible')lockScreen();});
+
+function levelBanner(){
+  const next=S.niveau+1;
+  if(next>5||!RECEPTEN.some(r=>r.l===next))return S.niveau>=2?'<p class="hint" style="margin-top:10px">Recepten voor niveau 3 en hoger komen later.</p>':'';
+  const n=new Set(S.log.filter(x=>x.r==='goed'&&x.n===S.niveau).map(x=>x.id)).size;
+  if(n<3)return `<p class="hint" style="margin-top:10px">${n} van 3 verschillende gerechten gelukt op dit niveau.</p>`;
+  return `<div class="banner"><strong>Klaar voor niveau ${next}?</strong><br>Je hebt ${n} verschillende gerechten goed gemaakt op niveau ${S.niveau}.<button class="btn" data-act="lvup">Naar niveau ${next}</button></div>`;
+}
+
+render();
+</script>
+</body>
+</html>
